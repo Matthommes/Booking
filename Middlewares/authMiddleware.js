@@ -9,7 +9,6 @@ const protect = asyncHandler(async (req, res, next) => {
     try {
       const decode = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decode.user;
-      console.log(decode.user);
     } catch (error) {
       res.status(401);
       throw new Error("Not authorized - Invalid token");

@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
-import bcrypt from "bcrypt"
-import { v4 as  uuidv4 } from "uuid";
+import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
 import prisma from "../Services/prisma.js";
 import { sendMail } from "./emailController.js";
@@ -35,11 +35,24 @@ const registerUser = asyncHandler(async (req, res) => {
     // Create new user
     const newUser = await prisma.user.create({
       data: {
-        email: email,
-        first_name: first_name,
-        last_name: last_name,
+        email,
         password: hashedPassword,
-        phone_number: parseInt(phone_number),
+        profile: {
+          create: {
+            email,
+            first_name,
+            last_name,
+            phone_number: parseInt(phone_number),
+          },
+        },
+      },
+      include: {
+        profile: true,
+      },
+      select: {
+        id: true,
+        email: true,
+        email_confirmed: true,
       },
     });
 
@@ -130,9 +143,15 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const user = await prisma.user.findMany({
       where: {
-        email: email,
+        email,
       },
     });
+
+    if (user[0].email_confirmed === false) {
+      res
+        .status(401)
+        .json({ status: false, message: "You need to confirm email to login" });
+    }
 
     if (!user || !user.length > 0) {
       res.status(401).json({ status: "error", message: "User doesn't exist" });
@@ -152,9 +171,18 @@ const loginUser = asyncHandler(async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(201).json({ status: "completed", user });
+    res.status(201).json({
+      status: "completed",
+      user: {
+        id: user[0].id,
+        email: user[0].email,
+        email_confirmed: user[0].email_confirmed,
+      },
+    });
   } catch (error) {
-    // next(error);
+    console.error(error);
+    res.status(500);
+    throw new Error("Internal server error");
   }
 });
 
