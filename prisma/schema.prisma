@@ -9,30 +9,37 @@ datasource db {
 }
 
 model User {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
-  email        String @unique
-  email_code    Int?
-  first_name   String
-  last_name    String
-  password     String
-  password_reset String?
-  phone_number Int
-  email_confirmed Boolean @default(false)
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  email           String   @unique
+  email_code      Int?
+  first_name      String
+  last_name       String
+  password        String
+  password_reset  String?
+  phone_number    Int
+  email_confirmed Boolean  @default(false)
+  profile         Profile?
+  category        Category?
 }
-
 
 model Profile {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
   // picture
-  name String
+  name    String
   message String?
   country String?
+  userId  String  @unique @db.ObjectId
+  user    User    @relation(fields: [userId], references: [id])
 }
+
 model Category {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  categoryId Int
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName  String
   configuration Json
+  userId  String @unique  @db.ObjectId
+  user User      @relation(fields:  [userId], references: [id])
 }
+
 model Booking {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   startTime String

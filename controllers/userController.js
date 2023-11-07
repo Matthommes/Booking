@@ -1,12 +1,10 @@
-const asyncHandler = require("express-async-handler");
-const bcrypt = require("bcrypt");
-const uuid = require("uuid");
-const jwt = require("jsonwebtoken");
-const { body, validationResult } = require("express-validator");
-const { PrismaClient } = require("@prisma/client");
-const { sendMail } = require("./emailController.js");
+import asyncHandler from "express-async-handler";
+import bcrypt from "bcrypt"
+import { v4 as  uuidv4 } from "uuid";
+import jwt from "jsonwebtoken";
+import prisma from "../Services/prisma.js";
+import { sendMail } from "./emailController.js";
 
-const prisma = new PrismaClient();
 const jwtSecret = process.env.JWT_SECRET;
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -83,7 +81,7 @@ const registerUser = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(404).json({ status: false, error });
     console.log(error);
-    return
+    return;
   }
 });
 
@@ -181,7 +179,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     }
 
     // UUID
-    const token = uuid.v4();
+    const token = uuidv4();
 
     await prisma.user.update({
       where: {
@@ -276,10 +274,4 @@ const resetPassword = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = {
-  registerUser,
-  confirmEmail,
-  loginUser,
-  forgotPassword,
-  resetPassword,
-};
+export { registerUser, confirmEmail, loginUser, forgotPassword, resetPassword };

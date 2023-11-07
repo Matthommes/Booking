@@ -1,18 +1,17 @@
-const express = require("express");
-const dotenv = require("dotenv").config();
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const { PrismaClient } = require("@prisma/client");
+import express from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import morgan from "morgan";
 
-const userRoutes = require("./routes/userRoutes.js");
-const categoryRoutes = require("./routes/CategoryRoutes.js");
-const { notFound, errorHandler } = require("./Middlewares/errorMiddleware.js");
+dotenv.config();
+
+import userRoutes from "./routes/userRoutes.js";
+import categoryRoutes from "./routes/CategoryRoutes.js";
+
+import { notFound, errorHandler } from "./Middlewares/errorMiddleware.js";
 
 const app = express();
-const prisma = new PrismaClient();
-
 
 // Middlewares
 app.use(cors());
